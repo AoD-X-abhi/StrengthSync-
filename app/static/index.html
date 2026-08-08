@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StrengthSync - AI Personal Fitness Coach</title>
+    <meta name="description" content="A Semester 5 Self Project implementing an AI-Powered Personal Fitness Coach using ML, Computer Vision, and XAI.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/static/style.css?v=1.0.5">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-theme">
+
+    <div class="app-container">
+
+
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/static/AppLogo.png" alt="StrengthSync Logo" style="height: 32px; width: 32px; object-fit: contain; border-radius: 4px;">
+                <span class="logo-text">StrengthSync</span>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="#dashboard" class="menu-item active" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#profile" class="menu-item" id="nav-profile">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span>Onboarding</span>
+                </a>
+
+                <a href="#workout" class="menu-item" id="nav-workout">
+                    <i class="fa-solid fa-dumbbell"></i>
+                    <span>Workout Log</span>
+                </a>
+
+                <a href="#nutrition" class="menu-item" id="nav-nutrition">
+                    <i class="fa-solid fa-apple-whole"></i>
+                    <span>Nutrition Log</span>
+                </a>
+                <a href="#photos" class="menu-item" id="nav-photos">
+                    <i class="fa-solid fa-images"></i>
+                    <span>Progress Photos</span>
+                </a>
+                <a href="#camera" class="menu-item" id="nav-camera">
+                    <i class="fa-solid fa-video"></i>
+                    <span>Pose Camera</span>
+                </a>
+                <a href="#chat" class="menu-item" id="nav-chat">
+                    <i class="fa-solid fa-circle-h"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="#analytics" class="menu-item" id="nav-analytics">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Progress Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-user" id="user-display">
+                <div class="user-avatar"><i class="fa-solid fa-circle-user"></i></div>
+                <div class="user-details">
+                    <span class="user-email" id="sidebar-user-email">guest@strengthsync.fit</span>
+                    <span class="user-role">Premium Athlete</span>
+                </div>
+                <button class="logout-btn" id="btn-logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </aside>
+
+
+        <main class="main-content">
+            <!-- Mobile Profile Header -->
+            <div class="mobile-header">
+                <div class="mobile-profile-info">
+                    <div class="mobile-profile-img">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
+                    <div class="mobile-profile-text">
+                        <span class="mobile-welcome-sub">Welcome Back</span>
+                        <span class="mobile-profile-name" id="mobile-welcome-email">guest@strengthsync.fit</span>
+                    </div>
+                </div>
+                <div class="mobile-header-bell" id="mobile-bell-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge-dot hide" id="mobile-noti-badge-dot" style="position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--neon-red);"></span>
+                </div>
+            </div>
+
+
+            <header class="top-nav">
+                <div class="nav-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search exercises, nutrition, recommendations...">
+                </div>
+                <div class="nav-actions">
+                    <button class="btn btn-secondary pdf-btn" id="btn-download-pdf"><i class="fa-solid fa-file-pdf"></i> Download Report</button>
+                    <div class="streak-showcase" id="topbar-streak-container" style="display: flex; align-items: center; gap: 8px; margin: 0 10px;" title="Daily Workout Streak">
+                        <div class="streak-badge" id="topbar-streak-badge" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: all 0.3s ease; border: 2px dotted #8e9cae; background: transparent;">
+                            <i class="fa-solid fa-fire" id="topbar-fireball" style="font-size: 1.1rem; transition: all 0.3s ease; color: #cbd5e1;"></i>
+                        </div>
+                        <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-secondary);" id="topbar-streak-text">0 Days</span>
+                    </div>
+                    <div style="position: relative;">
+                        <button class="icon-btn notification-btn" id="btn-notifications"><i class="fa-regular fa-bell"></i><span class="badge-dot hide" id="noti-badge-dot"></span></button>
+                        <div class="notifications-dropdown hide" id="notifications-dropdown">
+                            <h3>Smart Reminders</h3>
+                            <div class="notifications-list" id="notifications-list">
+                                <p class="no-notifications">No current reminders.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </header>
+
+
+            <section id="panel-dashboard" class="content-panel active">
+                <div class="panel-header">
+                    <h1>Active Performance Dashboard</h1>
+                    <p>Real-time analytics and neural physiological feedback.</p>
+                </div>
+
+                <!-- Weekly Progress Card -->
+                <div class="weekly-progress-card">
+                    <div class="weekly-progress-info">
+                        <span class="weekly-progress-title">Weekly Progress</span>
+                        <div class="weekly-progress-stat">
+                            <i class="fa-solid fa-circle-check" style="color:#050505;"></i>
+                            <span id="progress-card-workouts">0 Workouts Completed</span>
+                        </div>
+                        <div class="weekly-progress-stat">
+                            <i class="fa-solid fa-fire" style="color:#050505;"></i>
+                            <span id="progress-card-calories">0 kcal Burned</span>
+                        </div>
+                        <div class="weekly-progress-stat">
+                            <i class="fa-solid fa-shoe-prints" style="color:#050505;"></i>
+                            <span id="progress-card-steps">0 / 8,000 Steps</span>
+                        </div>
+                        <a href="#workout" class="weekly-progress-btn" id="progress-card-action-btn">
+                            Continue The Progress
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="weekly-progress-radial" id="weekly-progress-circle-conic">
+                        <span id="weekly-progress-pct-val">0%</span>
+                    </div>
+                </div>
+
+
+                <div class="metrics-grid">
+                    <div class="metric-card neon-blue">
+                        <div class="metric-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                        <div class="metric-info">
+                            <h3>Workouts This Week</h3>
+                            <div class="metric-value" id="dash-workouts-week">0</div>
+                            <p class="metric-subtext">Target: 4 sessions</p>
+                        </div>
+                    </div>
+                    <div class="metric-card neon-purple">
+                        <div class="metric-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                        <div class="metric-info">
+                            <h3>Total Training Time</h3>
+                            <div class="metric-value" id="dash-training-time">0m</div>
+                            <p class="metric-subtext">Accumulated active mins</p>
+                        </div>
+                    </div>
+                    <div class="metric-card neon-green">
+                        <div class="metric-icon"><i class="fa-solid fa-utensils"></i></div>
+                        <div class="metric-info">
+                            <h3>Calorie Intake</h3>
+                            <div class="metric-value" id="dash-calories">0 kcal</div>
+                            <p class="metric-subtext" id="dash-calorie-target">Goal: Calculated on Onboarding</p>
+                        </div>
+                    </div>
+                    <div class="metric-card neon-red" id="card-injury-risk">
+                        <div class="metric-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="metric-info">
+                            <h3>Fatigue & Injury Risk</h3>
+                            <div class="metric-value" id="dash-injury-risk">Low</div>
+                            <p class="metric-subtext" id="dash-injury-detail">Soreness: 0/10 | Sleep: 8h</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="dashboard-layout">
+
+                    <div class="dashboard-column card-glass">
+                        <!-- Category Filter Pills -->
+                        <div class="category-pills" id="workout-category-pills">
+                            <span class="pill-item active" data-category="All">All</span>
+                            <span class="pill-item" data-category="Strength">Strength</span>
+                            <span class="pill-item" data-category="Cardio">Cardio</span>
+                            <span class="pill-item" data-category="Recovery">Recovery</span>
+                        </div>
+                        <h2>Adaptive Coach Recommendations</h2>
+                        <div class="recommendation-box" id="xai-explanation-box">
+                            <div class="rec-alert warning">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span><strong>XAI Layer:</strong> Please complete your <strong>Onboarding Profile</strong> to generate personalized workout recommendations.</span>
+                            </div>
+                        </div>
+
+
+                        <div class="dashboard-widget weather-widget" style="margin-top: 24px;">
+                            <h3>Weather Workout Suggester</h3>
+                            <div class="weather-selector-row" style="display: flex; gap: 10px; margin-bottom: 12px;">
+                                <select id="dashboard-weather-select" class="form-input" style="flex: 1;">
+                                    <option value="Sunny">Clear Skies / Sunny</option>
+                                    <option value="Rainy">Rainy / Stormy</option>
+                                    <option value="Cold">Cold / Chilly</option>
+                                    <option value="Hot">Hot / Humid</option>
+                                </select>
+                                <button class="btn btn-primary" id="btn-get-weather-suggestion">Get Plan</button>
+                            </div>
+                            <div class="weather-output-box hide" id="weather-output-box" style="padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                                <h4 id="weather-rec-title" style="margin-top: 0; color: var(--neon-green);">Outdoor Run Suggestion</h4>
+                                <p id="weather-rec-details" style="font-size: 0.9rem; margin-bottom: 0;">Weather is perfect. Get outdoors!</p>
+                            </div>
+                        </div>
+
+
+                        
+
+
+                    </div>
+
+
+                    <div class="dashboard-column card-glass">
+                        <h2>Daily Recovery & Wearable Log</h2>
+                        <form id="form-quick-fatigue" class="glass-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="fatigue-soreness">Subjective Soreness (1-10)</label>
+                                    <input type="range" id="fatigue-soreness" min="1" max="10" value="5" class="slider">
+                                    <span class="slider-val" id="soreness-val">5/10</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fatigue-sleep">Sleep Duration (Hours)</label>
+                                    <input type="number" id="fatigue-sleep" min="2" max="16" step="0.5" value="8" class="form-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="recovery-steps">Steps Logged</label>
+                                    <input type="number" id="recovery-steps" min="0" max="50000" value="10000" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="recovery-active-min">Active Minutes</label>
+                                    <input type="number" id="recovery-active-min" min="0" max="300" value="45" class="form-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="recovery-hrv">HRV (ms)</label>
+                                    <input type="number" id="recovery-hrv" min="10" max="150" value="55" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="recovery-rhr">Resting HR (BPM)</label>
+                                    <input type="number" id="recovery-rhr" min="40" max="100" value="65" class="form-input">
+                                </div>
+                            </div>
+                            <div class="recovery-output-badge hide" id="recovery-output-badge" style="margin-top: 10px; margin-bottom: 10px; padding: 10px; border-radius: 8px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); text-align: center;">
+                                <span>ML Recovery Index: <strong><span id="predicted-recovery-val">82</span>%</strong></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-glow">Calculate Recovery & Log</button>
+                        </form>
+
+
+                        <!-- Fitness Goals Widget (Moved for structure) -->
+                        <div class="dashboard-widget goals-widget" style="margin-top: 24px;">
+                            <h3>Fitness Goals</h3>
+                            <div class="goals-container" id="dashboard-goals-container" style="display: flex; flex-direction: column; gap: 10px;">
+
+                            </div>
+                            <form id="form-add-goal" style="display: flex; gap: 8px; margin-top: 12px;">
+                                <input type="text" id="goal-name-input" placeholder="e.g. Daily Steps" required class="form-input" style="flex: 2;">
+                                <input type="number" id="goal-target-input" placeholder="Target" required class="form-input" style="flex: 1;">
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i></button>
+                            </form>
+                        </div>                    </div>
+                </div>
+            </section>
+
+
+            <section id="panel-profile" class="content-panel">
+                <div class="panel-header">
+                    <h1>Biometric Profile & Onboarding</h1>
+                    <p>Enter your physiological parameters to configure target AI algorithms.</p>
+                </div>
+
+                <div class="card-glass profile-container">
+                    <form id="form-onboarding" class="glass-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="profile-age"><i class="fa-solid fa-cake-candles"></i> Age (Years)</label>
+                                <input type="number" id="profile-age" required min="10" max="100" class="form-input" placeholder="e.g. 24">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-gender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+                                <select id="profile-gender" required class="form-input">
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Non-binary">Non-binary</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-height"><i class="fa-solid fa-arrows-up-down"></i> Height (cm)</label>
+                                <input type="number" id="profile-height" required min="100" max="250" class="form-input" placeholder="e.g. 175">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-weight"><i class="fa-solid fa-weight-scale"></i> Weight (kg)</label>
+                                <input type="number" id="profile-weight" required min="30" max="200" class="form-input" placeholder="e.g. 70">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-objective"><i class="fa-solid fa-crosshairs"></i> Primary Fitness Objective</label>
+                                <select id="profile-objective" required class="form-input">
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="Muscle Gain">Muscle Gain (Hypertrophy)</option>
+                                    <option value="Weight Loss">Weight Loss (Fat Loss)</option>
+                                    <option value="Endurance">Cardiovascular Endurance</option>
+                                    <option value="General Health">General Fitness & Longevity</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-activity"><i class="fa-solid fa-person-running"></i> Daily Activity Level</label>
+                                <select id="profile-activity" required class="form-input">
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="Sedentary">Sedentary (Office/Desk Job)</option>
+                                    <option value="Moderately Active">Moderately Active (Light workouts)</option>
+                                    <option value="Very Active">Very Active (Heavy training/Physical work)</option>
+                                </select>
+                            </div>
+                            <div class="form-group span-2">
+                                <label for="profile-injuries"><i class="fa-solid fa-band-aid"></i> Structural Injuries / Pain Areas (if any)</label>
+                                <input type="text" id="profile-injuries" class="form-input" placeholder="e.g. Lower back pain, left knee patellar tendinitis">
+                            </div>
+                            <div class="form-group span-2">
+                                <label for="profile-diet"><i class="fa-solid fa-leaf"></i> Dietary Restrictions or Preferences</label>
+                                <input type="text" id="profile-diet" class="form-input" placeholder="e.g. Vegetarian, High-protein, Nut-allergy">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <div class="bmi-badge-container hide" id="bmi-display-badge">
+                                <span>Calculated BMI: <strong><span id="calculated-bmi">22.5</span></strong></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-glow">Save Profile & Initialize AI</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+
+
+
+            <section id="panel-workout" class="content-panel">
+                <div class="panel-header">
+                    <h1>Workout Session Logger</h1>
+                    <p>Track your physical lifts to model training volumes and progression.</p>
+                </div>
+
+                <!-- Weekly Calendar Slider -->
+                <div class="calendar-slider" id="workout-calendar-slider">
+                    <!-- Populated dynamically in app.js -->
+                </div>
+
+                <div class="workout-layout">
+                    <div class="card-glass">
+                        <h2>Log New Exercise</h2>
+                        <form id="form-log-workout" class="glass-form">
+                            <div class="form-group">
+                                <label for="workout-exercise">Exercise Name</label>
+                                <select id="workout-exercise" class="form-input" required>
+                                    <option value="" disabled selected>Select exercise</option>
+                                    <optgroup label="Compound Lifts">
+                                        <option value="Barbell Squat">Barbell Squat</option>
+                                        <option value="Deadlift">Deadlift</option>
+                                        <option value="Barbell Bench Press">Barbell Bench Press</option>
+                                        <option value="Overhead Shoulder Press">Overhead Shoulder Press</option>
+                                    </optgroup>
+                                    <optgroup label="Bodyweight/Gymnastics">
+                                        <option value="Push-ups">Push-ups</option>
+                                        <option value="Pull-ups">Pull-ups</option>
+                                        <option value="Plank">Plank</option>
+                                        <option value="Lunges">Lunges</option>
+                                    </optgroup>
+                                    <optgroup label="Accessory Movements">
+                                        <option value="Bicep Curl">Bicep Curl</option>
+                                        <option value="Tricep Pushdown">Tricep Pushdown</option>
+                                        <option value="Lateral Raise">Lateral Raise</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="workout-sets">Sets</label>
+                                    <input type="number" id="workout-sets" min="1" max="10" value="3" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="workout-reps">Reps</label>
+                                    <input type="number" id="workout-reps" min="1" max="100" value="10" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="workout-weight">Weight (kg)</label>
+                                    <input type="number" id="workout-weight" min="0" max="400" step="0.5" value="0" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="workout-duration">Duration (mins)</label>
+                                    <input type="number" id="workout-duration" min="1" max="180" value="45" class="form-input" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-glow btn-block">Log Workout</button>
+                        </form>
+                    </div>
+
+                    <div class="card-glass">
+                        <h2>Workout History Log</h2>
+                        <div class="history-list-wrapper">
+                            <ul class="history-list" id="workout-history-list">
+                                <li class="history-empty">No workouts logged yet. Your metrics will appear here.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+
+            <section id="panel-nutrition" class="content-panel">
+                <div class="panel-header">
+                    <h1>Nutrition & Macro-nutrient Logging</h1>
+                    <p>Track daily calories, macros, and hydration targets.</p>
+                </div>
+
+                <div class="workout-layout">
+                    <div class="card-glass">
+                        <h2>Log Daily Meals</h2>
+                        <form id="form-log-nutrition" class="glass-form">
+                            <div class="form-group">
+                                <label for="nut-calories">Total Calories (kcal)</label>
+                                <input type="number" id="nut-calories" required min="500" max="8000" class="form-input" placeholder="e.g. 2100">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="nut-protein">Protein (g)</label>
+                                    <input type="number" id="nut-protein" min="0" max="500" value="120" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="nut-carbs">Carbs (g)</label>
+                                    <input type="number" id="nut-carbs" min="0" max="1000" value="200" class="form-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="nut-fats">Fats (g)</label>
+                                    <input type="number" id="nut-fats" min="0" max="300" value="65" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="nut-water">Water (Liters)</label>
+                                    <input type="number" id="nut-water" min="0" max="10" step="0.1" value="2.5" class="form-input">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-glow btn-block">Log Nutrition</button>
+                        </form>
+                    </div>
+
+                    <div class="card-glass">
+                        <h2>Nutrition Log History</h2>
+                        <div class="history-list-wrapper">
+                            <ul class="history-list" id="nutrition-history-list">
+                                <li class="history-empty">No nutritional entries logged today.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card-glass" style="grid-column: span 2; margin-top: 20px;">
+                        <h2>Meal & Diet Recommendation</h2>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                            <div class="form-group">
+                                <label for="diet-meal-type" style="font-size: 0.85rem; font-weight: 600;">Meal Type</label>
+                                <select id="diet-meal-type" class="form-input">
+                                    <option value="Breakfast">Breakfast</option>
+                                    <option value="Brunch">Brunch</option>
+                                    <option value="Lunch" selected>Lunch</option>
+                                    <option value="Dinner">Dinner</option>
+                                    <option value="Snacks">Snacks</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="diet-workout-relation" style="font-size: 0.85rem; font-weight: 600;">Workout Relation</label>
+                                <select id="diet-workout-relation" class="form-input">
+                                    <option value="Regular Meal" selected>Regular Meal (General)</option>
+                                    <option value="Pre-Workout Meal">Pre-Workout Meal</option>
+                                    <option value="Post-Workout Meal">Post-Workout Meal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="diet-extra-notes" style="font-size: 0.85rem; font-weight: 600;">Additional Preferences (Optional)</label>
+                            <input type="text" id="diet-extra-notes" class="form-input" placeholder="e.g. Low sodium, High fiber, Gluten free, Spicy..." style="width: 100%;">
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-glow" id="btn-generate-diet">Generate AI Meal Plan</button>
+
+
+                        <div id="diet-loading-indicator" class="hide" style="margin-top: 15px; text-align: center; padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                            <div class="loader-spinner" style="width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.08); border-top-color: var(--neon-green); border-radius: 50%; margin: 0 auto 10px;"></div>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;" class="pulse-fast">StrengthSync AI is compiling your meal plan...</span>
+                        </div>
+
+                        <div class="diet-output-box hide" id="diet-output-box" style="margin-top: 15px; padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+                            <div class="macro-target-row" style="display: flex; gap: 20px; font-weight: bold; margin-bottom: 12px; color: var(--neon-green);">
+                                <div>Daily Targets: Calories: <span id="diet-calories-val">2200</span> kcal | Protein: <span id="diet-protein-val">140</span>g | Carbs: <span id="diet-carbs-val">220</span>g | Fats: <span id="diet-fats-val">65</span>g</div>
+                            </div>
+
+                            <div class="diet-grid-layout">
+
+                                <div class="diet-plan-markdown" id="diet-plan-markdown" style="font-size: 0.95rem; line-height: 1.5; color: var(--text-primary); white-space: pre-wrap; overflow-x: auto;">
+
+                                </div>
+
+
+                                <div class="card-glass" style="padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; align-self: start;">
+                                    <h3 style="font-size: 0.95rem; margin-top: 0; margin-bottom: 15px; color: var(--text-primary); font-weight: 600; text-align: center;">Meal Composition</h3>
+                                    <div style="position: relative; width: 100%; height: 200px; max-width: 180px; display: flex; justify-content: center;">
+                                        <canvas id="canvas-diet-pie"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="panel-photos" class="content-panel">
+                <div class="panel-header">
+                    <h1>Progress Photo Tracker</h1>
+                    <p>Compare body transformations side-by-side to track visual progress.</p>
+                </div>
+
+                <div class="workout-layout">
+
+                    <div class="card-glass">
+                        <h2>Upload Progress Photo</h2>
+                        <form id="form-upload-photo" class="glass-form">
+                            <div class="form-group">
+                                <label for="photo-file-input">Select Image</label>
+                                <input type="file" id="photo-file-input" accept="image/*" class="form-input" style="padding: 10px;">
+                                <div style="margin-top: 10px; font-size: 0.85rem; color: #94a3b8; text-align: center;">- OR -</div>
+                                <input type="text" id="photo-url-input" placeholder="Enter image URL" class="form-input" style="margin-top: 10px;">
+                            </div>
+                            <div class="form-group">
+                                <label for="photo-weight">Current Weight (kg)</label>
+                                <input type="number" id="photo-weight" step="0.1" class="form-input" placeholder="e.g. 70.2">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-glow btn-block">Add Progress Photo</button>
+                        </form>
+                    </div>
+
+
+                    <div class="card-glass">
+                        <h2>Transformation Gallery</h2>
+                        <div class="photos-gallery" id="photos-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;">
+                            <p class="history-empty" id="photos-empty-msg">No progress photos uploaded yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="panel-camera" class="content-panel">
+                <div class="panel-header">
+                    <h1>Computer Vision Posture Detection</h1>
+                    <p>Uses real-time webcam landmarks to count repetitions and check physical safety.</p>
+                </div>
+
+                <div class="camera-layout">
+                    <div class="camera-workspace card-glass">
+
+                        <div class="webcam-viewport" id="webcam-viewport">
+                            <div class="viewport-overlay" id="viewport-overlay">
+                                <i class="fa-solid fa-video-slash"></i>
+                                <p>Webcam is currently disabled.</p>
+                                <button class="btn btn-primary" id="btn-toggle-camera">Enable Video Stream</button>
+                            </div>
+                            <video id="webcam-el" autoplay playsinline class="hide"></video>
+                            <canvas id="canvas-overlay" class="hide"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="camera-telemetry card-glass">
+                        <h2>Biomechanical Telemetry</h2>
+                        <div class="exercise-selector-wrapper">
+                            <label for="cam-exercise-select">Select Movement:</label>
+                            <select id="cam-exercise-select" class="form-input">
+                                <option value="Squats">Squats (Anatomical Hip/Knee Tracking)</option>
+                                <option value="Pushups">Push-ups (Elbow Deflection Tracking)</option>
+                                <option value="Plank">Planks (Back Alignment Timer)</option>
+                            </select>
+                        </div>
+
+
+                        <div class="telemetry-grid">
+                            <div class="telemetry-metric">
+                                <span class="tel-label">Rep Count</span>
+                                <span class="tel-value" id="tel-rep-count">0</span>
+                            </div>
+                            <div class="telemetry-metric">
+                                <span class="tel-label">State</span>
+                                <span class="tel-value" id="tel-rep-state">UP</span>
+                            </div>
+                            <div class="telemetry-metric span-2">
+                                <span class="tel-label">Joint Alignment</span>
+                                <div class="joint-indicator-bar">
+                                    <div class="indicator-fill green" style="width: 90%;"></div>
+                                </div>
+                                <span class="tel-sub" id="tel-joint-feedback">Good posture detected (90%)</span>
+                            </div>
+                        </div>
+
+
+                        <button class="btn btn-primary btn-glow btn-block" id="btn-save-cam-workout" style="margin-top: 16px; margin-bottom: 16px;" disabled>
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Log Tracked Session
+                        </button>
+
+
+                        <div class="camera-guidelines">
+                            <h4><i class="fa-solid fa-circle-question"></i> Placement Guidelines</h4>
+                            <ul>
+                                <li>Ensure your camera views your entire body in profile.</li>
+                                <li>Ensure the area is well lit.</li>
+                                <li>Position yourself 5–8 feet back from the camera lens.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="panel-chat" class="content-panel">
+                <div class="panel-header">
+                    <h1>StrengthSync - AI Fitness Assistant</h1>
+                    <p>Ask nutrition, movement mechanics, or programming queries backed by scientific LLM models.</p>
+                </div>
+
+                <div class="chat-wrapper card-glass">
+                    <div class="chat-messages" id="chat-messages-container">
+                        <div class="chat-message agent">
+                            <div class="msg-avatar"><i class="fa-solid fa-bolt-lightning"></i></div>
+                            <div class="msg-content">
+                                <p>Hello! I am StrengthSync, your AI Fitness Companion. Ask me anything about physical exercise, nutrition adjustments, or safety techniques!</p>
+                                <span class="msg-time">System Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="form-chat" class="chat-input-form">
+                        <input type="text" id="chat-input-text" placeholder="Ask about exercise mechanics, diet adjustments..." autocomplete="off">
+                        <button type="submit" class="btn btn-primary chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </section>
+
+
+            <section id="panel-analytics" class="content-panel">
+                <div class="panel-header">
+                    <h1>Progress Analytics</h1>
+                    <p>Dynamic sports-science telemetry modeling, ACWR fatigue gauges, and 1-Rep Max machine learning projections.</p>
+                </div>
+
+
+                <div class="metrics-grid" style="margin-bottom: 24px;">
+                    <div class="metric-card neon-purple">
+                        <div class="metric-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                        <div class="metric-info">
+                            <h3>Acute-to-Chronic Ratio</h3>
+                            <div class="metric-value" id="analytic-acwr">1.00</div>
+                            <p class="metric-subtext" id="analytic-acwr-status">Sweet Spot (0.8 - 1.2)</p>
+                        </div>
+                    </div>
+                    <div class="metric-card neon-red" id="card-analytic-risk">
+                        <div class="metric-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="metric-info">
+                            <h3>Injury Risk Tier</h3>
+                            <div class="metric-value" id="analytic-risk-tier">Low</div>
+                            <p class="metric-subtext">Based on physiological ACWR ratio</p>
+                        </div>
+                    </div>
+                    <div class="metric-card neon-blue">
+                        <div class="metric-icon"><i class="fa-solid fa-weight-hanging"></i></div>
+                        <div class="metric-info">
+                            <h3>Est. Squat 1-Rep Max</h3>
+                            <div class="metric-value" id="analytic-squat-1rm">0 kg</div>
+                            <p class="metric-subtext" id="analytic-squat-change">Baseline</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="analytics-charts-grid">
+                    <div class="card-glass chart-card">
+                        <h2>Daily Training Workload & ACWR Trend</h2>
+                        <p class="chart-subtitle">Bar: Workload (sets × reps × weight) | Line: ACWR Ratio</p>
+                        <div class="chart-container-wrapper">
+                            <canvas id="canvas-workload"></canvas>
+                        </div>
+                    </div>
+                    <div class="card-glass chart-card">
+                        <h2>1-Rep Max Trajectory & ML Forecast</h2>
+                        <p class="chart-subtitle">Solid Line: Historical Lift Progression | Dashed Line: 4-Week Projection</p>
+                        <div class="chart-container-wrapper" style="position: relative;">
+                            <canvas id="canvas-progression"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <!-- Bottom Mobile Navigation -->
+        <nav class="bottom-nav">
+            <a href="#dashboard" class="bottom-nav-item active" id="mobile-nav-dashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="#workout" class="bottom-nav-item" id="mobile-nav-workout">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Log</span>
+            </a>
+            <a href="#camera" class="bottom-nav-item" id="mobile-nav-camera">
+                <i class="fa-solid fa-video"></i>
+                <span>Camera</span>
+            </a>
+            <a href="#profile" class="bottom-nav-item" id="mobile-nav-profile">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+
+    <div class="modal-backdrop hide" id="auth-modal">
+        <div class="auth-modal-card card-glass">
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="btn-tab-login">Login</button>
+                <button class="tab-btn" id="btn-tab-register">Register</button>
+            </div>
+
+
+            <form id="form-auth-login" class="glass-form auth-form">
+                <h2>Welcome Back</h2>
+                <p>Access your training profile and models.</p>
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" required class="form-input" placeholder="e.g. athlete@strengthsync.fit">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required class="form-input" placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-glow btn-block">Sign In</button>
+            </form>
+
+
+            <form id="form-auth-register" class="glass-form auth-form hide">
+                <h2>Create Account</h2>
+                <p>Register to generate biometric models.</p>
+                <div class="form-group">
+                    <label for="register-email">Email Address</label>
+                    <input type="email" id="register-email" required class="form-input" placeholder="e.g. athlete@strengthsync.fit">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" required class="form-input" placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-glow btn-block">Register & Start</button>
+            </form>
+
+            <div class="auth-modal-footer">
+                <button class="btn btn-text" id="btn-guest-access">Continue as Guest (Auto-login)</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+
+    <script src="/static/app.js?v=1.0.5"></script>
+</body>
+</html>
