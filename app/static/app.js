@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 populateProfileForm();
 
 
-                loadDashboardData();
+                navigateToPanel(window.location.hash || "#dashboard");
             } else {
                 authModal.classList.remove("hide");
             }
