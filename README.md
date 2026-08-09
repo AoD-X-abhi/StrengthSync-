@@ -11,8 +11,6 @@ Built with an athletic dark theme featuring electric lime-green gradients, Stren
 ### 1. Dashboard & Progress Analytics
 ![Dashboard View](demo/dashboard.png)
 
-### 2. AI Computer Vision Pose Detection
-![Pose Detection View](demo/posedetection.png)
 
 ---
 
@@ -30,6 +28,7 @@ Built with an athletic dark theme featuring electric lime-green gradients, Stren
   * Visualizes macronutrient distribution (Protein, Carbs, Fats) on an interactive Chart.js doughnut chart.
 * **AI Computer Vision (Pose Detection)**:
   * Uses real-time camera tracking to analyze squat depth, push-up posture, and reps execution.
+![Pose Detection View](demo/posedetection.png)
 * **Local Machine Learning Estimators**:
   * Built-in Scikit-Learn pipelines to predict calories burned, target heart rate zones, and hourly hydration needs.
 
